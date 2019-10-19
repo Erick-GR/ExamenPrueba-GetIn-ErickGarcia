@@ -12,6 +12,7 @@ function data() {
   // Dictionary to handle all the data
   var info = {};
 
+  // Saves htmls checkbox state and waits for change in property
   var custom_control = d3.select(".custom-control");
   var check = custom_control.selectAll("input");
 
@@ -21,7 +22,6 @@ function data() {
 
   // First level - assignedStore data
   d3.json(assignedStore_url, function(store) {
-    // console.log(store.data);
     store_data = store.data;
 
     // Second level - brandDateData
@@ -39,15 +39,20 @@ function data() {
         "averagePermanence", "uptime"
       ];
 
+      // Extract data for each store
       data.forEach(d => {
+        // Extract each category of the brand data
         to_extract.forEach(t => {
           var sum = 0;
           var avg = 0;
           var up_cont = 0;
+
+          // Try module to see if category is in json dictionary, if not work other way
           try {
             info[d.identifier][t] = {};
             len = Object.keys(d[t]).length;
 
+            // Loops through all the dates
             Object.entries(d[t]).forEach(([key, value]) => {
               if (t == "uptime") {
                 if (+value == 0) {
@@ -93,14 +98,16 @@ function data() {
         });
       });
 
+      // Calls getTotals to calculate the Totals row
       tot = getTotals(info, selection);
-      console.log(tot);
 
+      // Sends the info dictionary to update function to build the table
       update(info, tot, selection);
     });
   });
 }
 
+// Calculates columns totals
 function getTotals(info, selection) {
   table_title = ["title", "peasants", "visitors",
     "attraction", "cabinet", "tickets",
@@ -158,6 +165,7 @@ function getTotals(info, selection) {
 
 }
 
+// Builds or updates the table
 function update(info, tot, selection) {
 
   var table = d3.select("#dataTable");
@@ -171,6 +179,7 @@ function update(info, tot, selection) {
     "items", "itemperTicket", "averagePermanence",
     "uptime"
   ];
+
   // Set table titles
   var head = table.append("thead");
   var rowHead = head.append("tr");
@@ -182,6 +191,7 @@ function update(info, tot, selection) {
 
   });
 
+  // Set table rows
   var body = table.append("tbody");
   Object.entries(info).forEach(([key, value]) => {
     var row = body.append("tr");
@@ -199,10 +209,12 @@ function update(info, tot, selection) {
     });
   });
 
+  // Set table footer
   var foot = table.append("tfoot");
   var rowFoot = foot.append("tr");
   rowFoot.attr("id", "new-foot");
 
+  // Erase any column with a value equal to 0
   var to_erase = [];
 
   table_title.forEach(title => {
@@ -219,8 +231,10 @@ function update(info, tot, selection) {
   });
 }
 
+// Update table state to average or sum
 function checkChange() {
   data();
 }
 
+// Start program
 main();
