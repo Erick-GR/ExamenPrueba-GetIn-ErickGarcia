@@ -94,6 +94,7 @@ function data() {
       });
 
       tot = getTotals(info, selection);
+      console.log(tot);
 
       update(info, tot, selection);
     });
@@ -128,6 +129,17 @@ function getTotals(info, selection) {
       } else if (t == "averagePermanence") {
         total_info[t] = ((total_info['permanence'] * 100) / total_info['permanenceCount']) / 6000000;
         total_info[t] = total_info[t].toFixed(2) + " min";
+      } else if (t == "uptime") {
+        var tot = 0;
+        var len = Object.keys(info).length;
+        console.log(len);
+        Object.entries(info).forEach(([key, value]) => {
+          var val = value[t][selection].split(" ");
+          console.log(val);
+          tot += +val[0] / 30;
+        });
+
+        total_info[t] = ((tot / len) * 100).toFixed(2) + " %";
       } else {
         var tot = 0;
         Object.entries(info).forEach(([key, value]) => {
